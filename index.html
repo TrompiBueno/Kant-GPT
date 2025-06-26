@@ -1,0 +1,751 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Kant GPT</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta property="og:title" content="Kant GPT">
+  <meta property="og:description" content="Built with Magic Loops">
+  <meta property="og:image" content="https://magicloops.dev/images/preview.png">
+  <meta property="og:url" content="https://z35gt.magicloops.app">
+  <meta name="twitter:card" content="https://magicloops.dev/images/preview.png">
+  <style>
+    body {
+      margin: 0; padding: 0;
+      overflow: hidden;
+      font-family: sans-serif;
+    }
+    iframe {
+      border: none;
+      width: 100%;
+      height: 100vh;
+    }
+    .hidden-iframe {
+      display: none; /* keep hidden for silent refresh */
+      width: 0; height: 0;
+    }
+  </style>
+</head>
+<body>
+  <!-- 
+    The main application content is in an <iframe> 
+    with user-generated HTML (appData.html).
+  -->
+  <iframe 
+    srcdoc='&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;es&quot;&gt;
+&lt;head&gt;
+  &lt;meta charset=&quot;UTF-8&quot;&gt;
+  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+  &lt;title&gt;Kant GPT&lt;/title&gt;
+  &lt;link rel=&quot;stylesheet&quot; href=&quot;https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css&quot;&gt;
+  &lt;link rel=&quot;stylesheet&quot; href=&quot;https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&amp;family=Roboto:wght@300;400;500&amp;display=swap&quot;&gt;
+  &lt;style id=&quot;app-style&quot;&gt;
+    :root {
+      --primary-color: #00f2ff;
+      --secondary-color: #4d00e6;
+      --bg-dark: #0f1923;
+      --bg-darker: #080d13;
+      --text-light: #e6f0ff;
+      --user-msg-bg: #304060;
+      --ai-msg-bg: #1e2b42;
+      --glow-shadow: 0 0 10px rgba(0, 242, 255, 0.7);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: &#039;Roboto&#039;, sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-light);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .chat-container {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+      background-color: var(--bg-darker);
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .header {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 1rem;
+      background: linear-gradient(90deg, var(--secondary-color), var(--bg-darker));
+      border-bottom: 2px solid var(--primary-color);
+      box-shadow: var(--glow-shadow);
+    }
+
+    .logo {
+      font-family: &#039;Orbitron&#039;, sans-serif;
+      font-weight: 700;
+      font-size: 2rem;
+      color: var(--text-light);
+      text-shadow: 0 0 5px var(--primary-color);
+      letter-spacing: 1px;
+    }
+
+    .messages-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      scroll-behavior: smooth;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(0, 242, 255, 0.05) 0%, transparent 20%),
+        radial-gradient(circle at 90% 80%, rgba(77, 0, 230, 0.05) 0%, transparent 20%);
+    }
+
+    .message {
+      max-width: 80%;
+      padding: 1rem;
+      border-radius: 1rem;
+      position: relative;
+      animation: fadeIn 0.3s ease-in-out;
+      word-break: break-word;
+      line-height: 1.5;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .message.ai {
+      align-self: flex-start;
+      background-color: var(--ai-msg-bg);
+      border-top-left-radius: 0;
+      border-left: 2px solid var(--primary-color);
+    }
+
+    .message.user {
+      align-self: flex-end;
+      background-color: var(--user-msg-bg);
+      border-top-right-radius: 0;
+      border-right: 2px solid var(--primary-color);
+    }
+
+    .message-time {
+      font-size: 0.7rem;
+      color: rgba(230, 240, 255, 0.7);
+      position: absolute;
+      bottom: 0.3rem;
+      right: 0.7rem;
+    }
+
+    .input-container {
+      display: flex;
+      gap: 0.5rem;
+      padding: 1rem;
+      background-color: var(--bg-darker);
+      border-top: 1px solid rgba(0, 242, 255, 0.3);
+    }
+
+    .message-input {
+      flex: 1;
+      padding: 0.8rem 1rem;
+      border-radius: 2rem;
+      border: 1px solid var(--primary-color);
+      background-color: rgba(14, 24, 36, 0.8);
+      color: var(--text-light);
+      font-size: 1rem;
+      outline: none;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 5px rgba(0, 242, 255, 0.3);
+    }
+
+    .message-input:focus {
+      box-shadow: var(--glow-shadow);
+    }
+
+    .send-button {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      border: none;
+      color: var(--text-light);
+      padding: 0.8rem 1.5rem;
+      border-radius: 2rem;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 5px rgba(0, 242, 255, 0.3);
+    }
+
+    .send-button:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--glow-shadow);
+    }
+
+    .send-button:active {
+      transform: translateY(1px);
+    }
+
+    .send-button i {
+      margin-left: 0.5rem;
+    }
+
+    .mic-button {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      border: none;
+      color: var(--text-light);
+      padding: 0.8rem;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 5px rgba(0, 242, 255, 0.3);
+    }
+
+    .mic-button:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--glow-shadow);
+    }
+
+    .mic-button:active {
+      transform: translateY(1px);
+    }
+
+    .mic-button.listening {
+      animation: micPulse 1.5s infinite;
+      background: linear-gradient(135deg, #ff3300, var(--secondary-color));
+    }
+
+    @keyframes micPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    .send-button {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      border: none;
+      color: var(--text-light);
+      padding: 0.8rem 1.5rem;
+      border-radius: 2rem;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 5px rgba(0, 242, 255, 0.3);
+    }
+
+    .send-button:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--glow-shadow);
+    }
+
+    .send-button:active {
+      transform: translateY(1px);
+    }
+
+    .send-button i {
+      margin-left: 0.5rem;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 0.8rem;
+      font-size: 0.9rem;
+      color: rgba(230, 240, 255, 0.8);
+      border-top: 1px solid rgba(0, 242, 255, 0.3);
+      background-color: var(--bg-darker);
+    }
+
+    .loading {
+      display: none;
+      align-self: flex-start;
+      padding: 1rem;
+      background-color: var(--ai-msg-bg);
+      border-radius: 1rem;
+      border-top-left-radius: 0;
+      animation: pulse 1.5s infinite;
+      border-left: 2px solid var(--primary-color);
+    }
+
+    .loading .dot {
+      display: inline-block;
+      width: 0.5rem;
+      height: 0.5rem;
+      margin: 0 0.2rem;
+      border-radius: 50%;
+      background-color: var(--primary-color);
+      animation: bounce 1.5s infinite;
+    }
+
+    .loading .dot:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .loading .dot:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+      .logo {
+        font-size: 1.5rem;
+      }
+
+      .message {
+        max-width: 90%;
+      }
+
+      .send-button {
+        padding: 0.8rem 1rem;
+      }
+
+      .send-button span {
+        display: none;
+      }
+
+      .send-button i {
+        margin-left: 0;
+      }
+
+      .mic-button {
+        padding: 0.8rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .header {
+        padding: 0.8rem;
+      }
+
+      .message {
+        padding: 0.8rem;
+        max-width: 95%;
+      }
+
+      .input-container {
+        padding: 0.8rem;
+      }
+
+      .message-input {
+        padding: 0.6rem 0.8rem;
+      }
+
+      .send-button {
+        padding: 0.6rem 0.8rem;
+      }
+
+      .footer {
+        padding: 0.6rem;
+        font-size: 0.8rem;
+      }
+    }
+  &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;div class=&quot;chat-container&quot;&gt;
+    &lt;header class=&quot;header&quot;&gt;
+      &lt;h1 class=&quot;logo&quot;&gt;Kant GPT&lt;/h1&gt;
+    &lt;/header&gt;
+
+    &lt;div class=&quot;messages-container&quot; id=&quot;messages-container&quot;&gt;
+      &lt;div class=&quot;message ai&quot;&gt;
+        &lt;p&gt;¡Saludos! Soy Kant GPT, tu asistente de filosofía moral...&lt;/p&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;div class=&quot;input-container&quot;&gt;
+      &lt;input type=&quot;text&quot; class=&quot;message-input&quot; id=&quot;message-input&quot; 
+        placeholder=&quot;Escribe tu pregunta o dilema moral aquí...&quot; 
+        aria-label=&quot;Mensaje&quot;&gt;
+      &lt;button class=&quot;mic-button&quot; id=&quot;mic-button&quot; aria-label=&quot;Activar reconocimiento de voz&quot;&gt;
+        &lt;i class=&quot;fas fa-microphone&quot;&gt;&lt;/i&gt;
+      &lt;/button&gt;
+      &lt;button class=&quot;send-button&quot; id=&quot;send-button&quot;&gt;
+        &lt;span&gt;Enviar&lt;/span&gt;
+        &lt;i class=&quot;fas fa-paper-plane&quot;&gt;&lt;/i&gt;
+      &lt;/button&gt;
+    &lt;/div&gt;
+
+    &lt;div class=&quot;loading&quot; id=&quot;loading&quot;&gt;
+      &lt;div class=&quot;dot&quot;&gt;&lt;/div&gt;
+      &lt;div class=&quot;dot&quot;&gt;&lt;/div&gt;
+      &lt;div class=&quot;dot&quot;&gt;&lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;footer class=&quot;footer&quot;&gt;
+      Creado por Miguel Ojeda 2ºB
+    &lt;/footer&gt;
+  &lt;/div&gt;
+  
+  &lt;script&gt;
+    // DOM Elements
+    const messagesContainer = document.getElementById(&#039;messages-container&#039;);
+    const messageInput = document.getElementById(&#039;message-input&#039;);
+    const sendButton = document.getElementById(&#039;send-button&#039;);
+    const micButton = document.getElementById(&#039;mic-button&#039;);
+    const loadingIndicator = document.getElementById(&#039;loading&#039;);
+    
+    // Speech Recognition Setup
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let recognition;
+    
+    if (SpeechRecognition) {
+      recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.lang = &#039;es-ES&#039;;
+      recognition.interimResults = true;
+    
+      recognition.onresult = (event) =&gt; {
+        const transcript = Array.from(event.results)
+          .map(result =&gt; result[0])
+          .map(result =&gt; result.transcript)
+          .join(&#039;&#039;);
+    
+        messageInput.value = transcript;
+      };
+    
+      recognition.onend = () =&gt; {
+        micButton.classList.remove(&#039;listening&#039;);
+        micButton.querySelector(&#039;i&#039;).className = &#039;fas fa-microphone&#039;;
+      };
+    
+      recognition.onerror = (event) =&gt; {
+        console.error(&#039;Error en reconocimiento de voz:&#039;, event.error);
+        micButton.classList.remove(&#039;listening&#039;);
+        micButton.querySelector(&#039;i&#039;).className = &#039;fas fa-microphone&#039;;
+      };
+    }
+    
+    // Speech Synthesis Setup
+    const synth = window.speechSynthesis;
+    
+    // Toggle speech recognition
+    micButton.addEventListener(&#039;click&#039;, () =&gt; {
+      if (!SpeechRecognition) {
+        alert(&#039;Lo siento, tu navegador no soporta reconocimiento de voz.&#039;);
+        return;
+      }
+    
+      if (micButton.classList.contains(&#039;listening&#039;)) {
+        recognition.stop();
+      } else {
+        messageInput.value = &#039;&#039;;
+        recognition.start();
+        micButton.classList.add(&#039;listening&#039;);
+        micButton.querySelector(&#039;i&#039;).className = &#039;fas fa-microphone-slash&#039;;
+      }
+    });
+    
+    // Function to speak text
+    function speakText(text) {
+      if (synth.speaking) {
+        synth.cancel();
+      }
+      
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = &#039;es-ES&#039;;
+      utterance.rate = 1;
+      utterance.pitch = 1;
+      synth.speak(utterance);
+    }
+    
+    // Function to add message to the chat
+    function addMessage(text, isUser = false) {
+      const messageDiv = document.createElement(&#039;div&#039;);
+      messageDiv.classList.add(&#039;message&#039;);
+      messageDiv.classList.add(isUser ? &#039;user&#039; : &#039;ai&#039;);
+      
+      const paragraph = document.createElement(&#039;p&#039;);
+      paragraph.textContent = text;
+      messageDiv.appendChild(paragraph);
+      
+      const timeSpan = document.createElement(&#039;span&#039;);
+      timeSpan.classList.add(&#039;message-time&#039;);
+      const now = new Date();
+      timeSpan.textContent = `${now.getHours()}:${String(now.getMinutes()).padStart(2, &#039;0&#039;)}`;
+      messageDiv.appendChild(timeSpan);
+      
+      messagesContainer.appendChild(messageDiv);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      
+      // If it&#039;s an AI response, speak it
+      if (!isUser) {
+        speakText(text);
+      }
+    }
+    
+    // Handle sending messages
+    async function sendMessage() {
+      const message = messageInput.value.trim();
+      if (!message) return;
+      
+      // Add user message to chat
+      addMessage(message, true);
+      messageInput.value = &#039;&#039;;
+      
+      // Show loading indicator
+      loadingIndicator.style.display = &#039;block&#039;;
+      messagesContainer.appendChild(loadingIndicator);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      
+      try {
+        // Send to KantGPT API
+        const response = await fetch(&#039;https://magicloops.dev/api/loop/6a73ccb3-dcf4-4f27-bb29-09a102a6f078/run&#039;, {
+          method: &#039;POST&#039;,
+          body: JSON.stringify({ &quot;query&quot;: message }),
+          headers: {
+            &#039;Content-Type&#039;: &#039;application/json&#039;
+          }
+        });
+        
+        const data = await response.json();
+        
+        // Hide loading indicator
+        loadingIndicator.style.display = &#039;none&#039;;
+        
+        // Add AI response to chat
+        if (data &amp;&amp; data.response) {
+          addMessage(data.response);
+        } else {
+          addMessage(&#039;Lo siento, no pude procesar tu solicitud.&#039;);
+        }
+      } catch (error) {
+        console.error(&#039;Error sending message:&#039;, error);
+        loadingIndicator.style.display = &#039;none&#039;;
+        addMessage(&#039;Ha ocurrido un error. Por favor intenta de nuevo más tarde.&#039;);
+      }
+    }
+    
+    // Event listeners
+    sendButton.addEventListener(&#039;click&#039;, sendMessage);
+    
+    messageInput.addEventListener(&#039;keypress&#039;, (e) =&gt; {
+      if (e.key === &#039;Enter&#039;) {
+        sendMessage();
+      }
+    });
+  &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;' 
+    sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-modals allow-downloads allow-popups allow-presentation">
+  </iframe>
+
+  <!-- Hidden iframe used for "silent" SSO attempts -->
+  <iframe 
+    id="silentAuthFrame" 
+    class="hidden-iframe"
+    sandbox="allow-same-origin allow-scripts allow-forms">
+  </iframe>
+
+  <script>
+    /**
+     * 1) On page load, we check if the subdomain JWT is valid.
+     * 2) If not valid, we attempt a SILENT login in a hidden iframe.
+     * 3) If silent login fails, we open a POPUP for a visible login.
+     * 4) We also schedule a token refresh before it expires.
+     */
+    (function(){
+      const VERIFY_ENDPOINT = '/api/auth/verify';
+      const SUBDOMAIN = window.location.host.split('.')[0] || 'blog'; 
+      // e.g. "app1" from "app1.magicloops.dev"
+
+      // Build the authorize URL to magicloops.dev
+      // This will generate a single-use code & redirect back to our callback
+      // "redirect_to" => subdomain callback, which sets our cookie
+      const AUTH_BASE = 'https://magicloops.dev/api/sso/authorize';
+      const LOGIN_BASE = 'https://magicloops.dev/login';
+      const CALLBACK_URL = `https://${window.location.host}/api/auth/callback`;
+      const authorizeUrl = new URL(AUTH_BASE);
+      authorizeUrl.searchParams.set('subdomain', SUBDOMAIN);
+      authorizeUrl.searchParams.set('redirect_to', CALLBACK_URL);
+      const loginUrl = new URL(AUTH_BASE);
+      loginUrl.searchParams.set('subdomain', SUBDOMAIN);
+      loginUrl.searchParams.set('redirect_to', CALLBACK_URL);
+
+      /**
+       * Make a GET request to /api/auth/verify to see if subdomain_jwt is valid.
+       * Returns { userId, exp } if OK, or 401 if missing/expired.
+       */
+      async function verifySession() {
+        const resp = await fetch(VERIFY_ENDPOINT, { method: 'GET' });
+        if (!resp.ok) {
+          throw new Error('Verify failed: ' + resp.status);
+        }
+        return await resp.json(); // { userId, exp }
+      }
+
+      /**
+       * Perform a "silent" SSO attempt by loading the authorize endpoint
+       * in a hidden iframe. If the main domain session is still valid,
+       * the user won't see a login prompt. On success, our callback sets the cookie.
+       *
+       * We'll wait for the iframe to load & then re-check our subdomain /verify.
+       */
+      async function doSilentAuth() {
+        return new Promise((resolve, reject) => {
+          const frame = document.getElementById('silentAuthFrame');
+          frame.src = authorizeUrl.toString();
+
+          // We'll listen to "load" event. Once it loads, we check /verify again.
+          frame.onload = async function() {
+            try {
+              const data = await verifySession();
+              resolve(data); // userId, exp
+            } catch (err) {
+              reject(err);
+            }
+          };
+
+          // Optional: handle error event
+          frame.onerror = () => {
+            reject(new Error('Hidden iframe load error'));
+          };
+        });
+      }
+
+      /**
+       * Open a popup with the magicloops.dev authorize URL.
+       * If the user needs to log in, they'll see the Supabase screen.
+       * Once the callback sets the JWT, we poll for closure & re-verify.
+       */
+      async function doPopupAuth() {
+        return new Promise((resolve, reject) => {
+          const popup = window.open(
+            loginUrl.toString(),
+            'authPopup',
+            'width=600,height=700'
+          );
+          if (!popup) {
+            return reject(new Error('Popup blocked'));
+          }
+
+          const timer = setInterval(async () => {
+            // If popup closed, check if we have a valid session
+            if (popup.closed) {
+              clearInterval(timer);
+              try {
+                const data = await verifySession();
+                resolve(data);
+              } catch (err) {
+                reject(err);
+              }
+            }
+          }, 500);
+        });
+      }
+
+      /**
+       * The main login flow attempt:
+       * 1) Try verifying subdomain_jwt
+       * 2) If missing/expired, attempt SILENT iframe
+       * 3) If silent fails => fallback to POPUP
+       */
+      async function ensureLoggedIn() {
+        try {
+          const info = await verifySession();
+          // Already valid. Return info { userId, exp }
+          return info;
+        } catch (err) {
+          // Not logged in or token expired
+          console.log('No valid subdomain JWT, attempting silent auth...');
+        }
+
+        // Attempt silent auth in hidden iframe
+        try {
+          const info = await doSilentAuth();
+          console.log('Silent auth success:', info);
+          return info;
+        } catch (err) {
+          console.warn('Silent auth failed, opening popup...');
+        }
+
+        // Fallback to popup
+        try {
+//          const info = await doPopupAuth();
+//          console.log('Popup auth success:', info);
+//          return info;
+        } catch (err) {
+          console.error('Popup login failed or canceled:', err);
+          throw err;
+        }
+      }
+
+      /**
+       * Schedule an automatic token refresh a bit before the token expires.
+       * For example, refresh 1 minute before exp or halfway—your choice.
+       */
+      function scheduleAutoRefresh(exp) {
+        // Current time in seconds
+        const nowSeconds = Math.floor(Date.now() / 1000);
+        // Refresh 30 seconds before actual expiration, for safety
+        const refreshTime = Math.max((exp - 30) - nowSeconds, 1);
+        const refreshMs = refreshTime * 1000;
+
+        console.log('Scheduling refresh in', refreshTime, 'seconds');
+        setTimeout(async () => {
+          console.log('Attempting token refresh...');
+          try {
+            const info = await doSilentAuth();
+            console.log('Token silently refreshed:', info);
+            scheduleAutoRefresh(info.exp);
+          } catch (err) {
+            console.warn('Silent refresh failed, fallback to popup...');
+            // If silent refresh fails, we do popup to re-auth
+            try {
+//              const info = await doPopupAuth();
+//              console.log('Popup refresh success:', info);
+//              scheduleAutoRefresh(info.exp);
+            } catch (popErr) {
+              console.error('Popup refresh also failed. User not logged in:', popErr);
+            }
+          }
+        }, refreshMs);
+      }
+
+      // Now, run the main flow on page load
+      (async function main() {
+        try {
+console.log('Hello Magic App User!');
+          const info = await ensureLoggedIn();
+          console.log('User is logged in:', info);
+          // After we confirm a valid JWT, we schedule the refresh
+          scheduleAutoRefresh(info.exp);
+        } catch (err) {
+          console.error('User is not logged in and refused to log in:', err);
+          // Show a message or redirect if needed
+        }
+      })();
+
+    })();
+  </script>
+</body>
+</html>
+
