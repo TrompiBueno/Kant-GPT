@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -51,6 +50,7 @@
       --user-msg-bg: #304060;
       --ai-msg-bg: #1e2b42;
       --glow-shadow: 0 0 10px rgba(0, 242, 255, 0.7);
+      --parchment-color: #f5f0e1;
     }
 
     * {
@@ -60,13 +60,15 @@
     }
 
     body {
-      font-family: &#039;Roboto&#039;, sans-serif;
+      font-family: &#039;Merriweather&#039;, serif, &#039;Roboto&#039;, sans-serif;
       background-color: var(--bg-dark);
       color: var(--text-light);
       height: 100vh;
       display: flex;
       flex-direction: column;
       overflow: hidden;
+      background-image: url(&#039;https://www.transparenttextures.com/patterns/paper.png&#039;);
+      background-blend-mode: overlay;
     }
 
     .chat-container {
@@ -80,6 +82,8 @@
       box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
       border-radius: 8px;
       overflow: hidden;
+      background-image: url(&#039;https://www.transparenttextures.com/patterns/parchment.png&#039;);
+      background-blend-mode: overlay;
     }
 
     .header {
@@ -90,15 +94,7 @@
       background: linear-gradient(90deg, var(--secondary-color), var(--bg-darker));
       border-bottom: 2px solid var(--primary-color);
       box-shadow: var(--glow-shadow);
-    }
-
-    .logo {
-      font-family: &#039;Orbitron&#039;, sans-serif;
-      font-weight: 700;
-      font-size: 2rem;
-      color: var(--text-light);
-      text-shadow: 0 0 5px var(--primary-color);
-      letter-spacing: 1px;
+      position: relative;
     }
 
     .messages-container {
@@ -122,6 +118,8 @@
       animation: fadeIn 0.3s ease-in-out;
       word-break: break-word;
       line-height: 1.5;
+      background-image: url(&#039;https://www.transparenttextures.com/patterns/paper-fibers.png&#039;);
+      background-blend-mode: overlay;
     }
 
     @keyframes fadeIn {
@@ -204,7 +202,7 @@
       margin-left: 0.5rem;
     }
 
-    .mic-button {
+    .camera-button {
       background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
       border: none;
       color: var(--text-light);
@@ -218,33 +216,22 @@
       box-shadow: 0 0 5px rgba(0, 242, 255, 0.3);
     }
 
-    .mic-button:hover {
+    .camera-button:hover {
       transform: translateY(-2px);
       box-shadow: var(--glow-shadow);
     }
 
-    .mic-button:active {
+    .camera-button:active {
       transform: translateY(1px);
     }
 
-    .mic-button.listening {
-      animation: micPulse 1.5s infinite;
-      background: linear-gradient(135deg, #ff3300, var(--secondary-color));
-    }
-
-    @keyframes micPulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.7; }
-    }
-
-    .send-button {
+    .file-button {
       background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
       border: none;
       color: var(--text-light);
-      padding: 0.8rem 1.5rem;
-      border-radius: 2rem;
+      padding: 0.8rem;
+      border-radius: 50%;
       cursor: pointer;
-      font-weight: 500;
       transition: all 0.3s ease;
       display: flex;
       align-items: center;
@@ -252,17 +239,13 @@
       box-shadow: 0 0 5px rgba(0, 242, 255, 0.3);
     }
 
-    .send-button:hover {
+    .file-button:hover {
       transform: translateY(-2px);
       box-shadow: var(--glow-shadow);
     }
 
-    .send-button:active {
+    .file-button:active {
       transform: translateY(1px);
-    }
-
-    .send-button i {
-      margin-left: 0.5rem;
     }
 
     .footer {
@@ -272,6 +255,7 @@
       color: rgba(230, 240, 255, 0.8);
       border-top: 1px solid rgba(0, 242, 255, 0.3);
       background-color: var(--bg-darker);
+      position: relative;
     }
 
     .loading {
@@ -335,7 +319,7 @@
         margin-left: 0;
       }
 
-      .mic-button {
+      .camera-button, .file-button {
         padding: 0.8rem;
       }
     }
@@ -362,6 +346,10 @@
         padding: 0.6rem 0.8rem;
       }
 
+      .camera-button, .file-button {
+        padding: 0.6rem 0.8rem;
+      }
+
       .footer {
         padding: 0.6rem;
         font-size: 0.8rem;
@@ -385,10 +373,7 @@
       &lt;input type=&quot;text&quot; class=&quot;message-input&quot; id=&quot;message-input&quot; 
         placeholder=&quot;Escribe tu pregunta o dilema moral aquí...&quot; 
         aria-label=&quot;Mensaje&quot;&gt;
-      &lt;button class=&quot;mic-button&quot; id=&quot;mic-button&quot; aria-label=&quot;Activar reconocimiento de voz&quot;&gt;
-        &lt;i class=&quot;fas fa-microphone&quot;&gt;&lt;/i&gt;
-      &lt;/button&gt;
-      &lt;button class=&quot;send-button&quot; id=&quot;send-button&quot;&gt;
+      &lt;button class=&quot;send-button&quot; id=&quot;send-button&quot; type=&quot;button&quot;&gt;
         &lt;span&gt;Enviar&lt;/span&gt;
         &lt;i class=&quot;fas fa-paper-plane&quot;&gt;&lt;/i&gt;
       &lt;/button&gt;
@@ -410,59 +395,30 @@
     const messagesContainer = document.getElementById(&#039;messages-container&#039;);
     const messageInput = document.getElementById(&#039;message-input&#039;);
     const sendButton = document.getElementById(&#039;send-button&#039;);
-    const micButton = document.getElementById(&#039;mic-button&#039;);
     const loadingIndicator = document.getElementById(&#039;loading&#039;);
     
-    // Speech Recognition Setup
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    let recognition;
+    // OpenAI API Key
+    const OPENAI_API_KEY = &#039;YOUR_OPENAI_API_KEY&#039;;
     
-    if (SpeechRecognition) {
-      recognition = new SpeechRecognition();
-      recognition.continuous = false;
-      recognition.lang = &#039;es-ES&#039;;
-      recognition.interimResults = true;
+    // Chat history storage
+    let chatHistory = [];
     
-      recognition.onresult = (event) =&gt; {
-        const transcript = Array.from(event.results)
-          .map(result =&gt; result[0])
-          .map(result =&gt; result.transcript)
-          .join(&#039;&#039;);
-    
-        messageInput.value = transcript;
-      };
-    
-      recognition.onend = () =&gt; {
-        micButton.classList.remove(&#039;listening&#039;);
-        micButton.querySelector(&#039;i&#039;).className = &#039;fas fa-microphone&#039;;
-      };
-    
-      recognition.onerror = (event) =&gt; {
-        console.error(&#039;Error en reconocimiento de voz:&#039;, event.error);
-        micButton.classList.remove(&#039;listening&#039;);
-        micButton.querySelector(&#039;i&#039;).className = &#039;fas fa-microphone&#039;;
-      };
-    }
+    // Load chat history from localStorage
+    document.addEventListener(&#039;DOMContentLoaded&#039;, () =&gt; {
+      localStorage.removeItem(&#039;chatHistory&#039;); // Clear old history on reload
+      const savedHistory = localStorage.getItem(&#039;chatHistory&#039;);
+      if (savedHistory) {
+        chatHistory = JSON.parse(savedHistory);
+        
+        // Render saved messages
+        chatHistory.forEach(msg =&gt; {
+          addMessage(msg.text, msg.isUser, false);
+        });
+      }
+    });
     
     // Speech Synthesis Setup
     const synth = window.speechSynthesis;
-    
-    // Toggle speech recognition
-    micButton.addEventListener(&#039;click&#039;, () =&gt; {
-      if (!SpeechRecognition) {
-        alert(&#039;Lo siento, tu navegador no soporta reconocimiento de voz.&#039;);
-        return;
-      }
-    
-      if (micButton.classList.contains(&#039;listening&#039;)) {
-        recognition.stop();
-      } else {
-        messageInput.value = &#039;&#039;;
-        recognition.start();
-        micButton.classList.add(&#039;listening&#039;);
-        micButton.querySelector(&#039;i&#039;).className = &#039;fas fa-microphone-slash&#039;;
-      }
-    });
     
     // Function to speak text
     function speakText(text) {
@@ -478,7 +434,7 @@
     }
     
     // Function to add message to the chat
-    function addMessage(text, isUser = false) {
+    function addMessage(text, isUser = false, saveToHistory = true) {
       const messageDiv = document.createElement(&#039;div&#039;);
       messageDiv.classList.add(&#039;message&#039;);
       messageDiv.classList.add(isUser ? &#039;user&#039; : &#039;ai&#039;);
@@ -500,38 +456,81 @@
       if (!isUser) {
         speakText(text);
       }
+      
+      // Save to chat history if needed
+      if (saveToHistory) {
+        chatHistory.push({ text, isUser });
+      }
+    }
+    
+    // Handle creator query
+    function handleCreatorQuery() {
+      const creatorResponse = &quot;Mi creador es Miguel Ojeda de 2ºB.&quot;;
+      addMessage(creatorResponse);
+      return true;
+    }
+    
+    // Handle chat history retrieval
+    function handleChatRetrieval() {
+      const password = prompt(&quot;Por favor, introduce la contraseña para acceder a los chats anteriores:&quot;);
+      
+      if (password === &quot;Kant-GPT_Mola&quot;) {
+        let formattedHistory = &quot;--- HISTORIAL DE CHATS ---\n\n&quot;;
+        
+        chatHistory.forEach((msg, index) =&gt; {
+          const sender = msg.isUser ? &quot;Usuario&quot; : &quot;Kant GPT&quot;;
+          formattedHistory += `[${sender}]: ${msg.text}\n\n`;
+        });
+        
+        addMessage(formattedHistory);
+      } else {
+        addMessage(&quot;Contraseña incorrecta.&quot;);
+      }
+      
+      return true;
     }
     
     // Handle sending messages
     async function sendMessage() {
       const message = messageInput.value.trim();
       if (!message) return;
-      
-      // Add user message to chat
+
       addMessage(message, true);
       messageInput.value = &#039;&#039;;
-      
-      // Show loading indicator
+
+      // built-in handlers
+      if (/quién es tu creador|quien es tu creador|quién te creó|quien te creo|quién te hizo|quien te hizo|QUIÉN ES TU CREADOR|QUIEN ES TU CREADOR|QUIÉN TE CREÓ|QUIEN TE CREO|QUIÉN TE HIZO|QUIEN TE HIZO|Quién es tu creador|Quien es tu creador|Quién te creó|Quien te creo|Quién te hizo|Quien te hizo|¿quién es tu creador?|¿quien es tu creador?|¿quién te creó?|¿quien te creo?|¿quién te hizo?|¿quien te hizo?|¿QUIÉN ES TU CREADOR?|¿QUIEN ES TU CREADOR?|¿QUIÉN TE CREÓ?|¿QUIEN TE CREO?|¿QUIÉN TE HIZO?|¿QUIEN TE HIZO?|¿Quién es tu creador?|¿Quien es tu creador?|¿Quién te creó?|¿Quien te creo?|¿Quién te hizo?|¿Quien te hizo?|fuiste creado por quién|fuiste creado por quien|fuiste hecho por quién|fuiste hecho por quien|quién fue tu creador|quien fue tu creador|quién fue quien te creó|quien fue quien te creó|quién fue quien te hizo|quien fue quien te hizo|quién es el que te creó|quién es el que te hizo|quién es el creador tuyo|quien es el creador tuyo|QUIÉN FUE TU CREADOR|QUIÉN FUE TU CREADOR|QUIÉN FUE QUIEN TE CREÓ|QUIÉN FUE QUIEN TE HIZO|¿Quién fue tu creador?|¿Quién fue quien te creó?|¿Quién fue quien te hizo?|¿Quién te hizo?|¿Quién te creó?|¿Quién es tu creador?|¿Quién te programó?|¿Quién te inventó?|¿Quién te construyó?|quién te programó|quién te inventó|quién te construyó|quien te programo|quien te invento|quien te construyo|quién fue tu diseñador|quien fue tu diseñador|quién fue tu inventor|quien fue tu inventor|QUIÉN TE PROGRAMÓ|QUIÉN TE INVENTÓ|QUIÉN TE CONSTRUYÓ|QUIÉN FUE TU DISEÑADOR|QUIÉN FUE TU INVENTOR|quién fue el que te creó|quién fue el que te inventó|quién fue el que te programó|QUIÉN FUE EL QUE TE CREÓ|QUIÉN FUE EL QUE TE INVENTÓ|QUIÉN FUE EL QUE TE PROGRAMÓ|quién te desarrolló|quién fue tu desarrollador|QUIÉN TE DESARROLLÓ|QUIÉN FUE TU DESARROLLADOR|quién está detrás de ti|QUIÉN ESTÁ DETRÁS DE TI|¿Quién está detrás de ti?|¿quién te desarrolló?|¿quién te creó?|¿quién te programó?|¿quién es tu desarrollador?|¿quién te ha creado?|¿quien te ha creado?|¿QUIÉN TE HA CREADO?|¿QUIEN TE HA CREADO?|¿Quién te ha creado?|¿Quien te ha creado?|quién te ha creado|quien te ha creado|QUIÉN TE HA CREADO|QUIEN TE HA CREADO|Quién te ha creado|Quien te ha creado|¿quién te ha hecho?|¿quien te ha hecho?|¿QUIÉN TE HA HECHO?|¿QUIEN TE HA HECHO?|¿Quién te ha hecho?|¿Quien te ha hecho?|quién te ha hecho|quien te ha hecho|QUIÉN TE HA HECHO|QUIEN TE HA HECHO|Quién te ha hecho|Quien te ha hecho|¿quién ha sido tu creador?|¿quien ha sido tu creador?|¿QUIÉN HA SIDO TU CREADOR?|¿QUIEN HA SIDO TU CREADOR?|quién ha sido tu creador|quien ha sido tu creador|QUIÉN HA SIDO TU CREADOR|QUIEN HA SIDO TU CREADOR|¿quién ha sido el que te creó?|¿quien ha sido el que te creó?|¿QUIÉN HA SIDO EL QUE TE CREÓ?|¿QUIEN HA SIDO EL QUE TE CREÓ?|quién ha sido el que te creó|quien ha sido el que te creó|QUIÉN HA SIDO EL QUE TE CREÓ|QUIEN HA SIDO EL QUE TE CREÓ|quién te ha creado|quien te ha creado|quién te ha hecho|quien te ha hecho|QUIÉN TE HA CREADO|QUIEN TE HA CREADO|QUIÉN TE HA HECHO|QUIEN TE HA HECHO|Quién te ha creado|Quien te ha creado|Quién te ha hecho|Quien te ha hecho|¿quién te ha creado?|¿quien te ha creado?|¿quién te ha hecho?|¿quien te ha hecho?|¿QUIÉN TE HA CREADO?|¿QUIEN TE HA CREADO?|¿QUIÉN TE HA HECHO?|¿QUIEN TE HA HECHO?|¿Quién te ha creado?|¿Quien te ha creado?|¿Quién te ha hecho?|¿Quien te ha hecho?|has sido creado por quién|has sido creado por quien|has sido hecho por quién|has sido hecho por quien|quién ha sido tu creador|quien ha sido tu creador|quién ha sido quien te ha creado|quien ha sido quien te ha creado|quién ha sido quien te ha hecho|quien ha sido quien te ha hecho|quién es el que te ha creado|quién es el que te ha hecho|quién es el que te ha programado|quien es el que te ha programado|QUIÉN HA SIDO TU CREADOR|QUIÉN HA SIDO TU CREADOR|QUIÉN HA SIDO QUIEN TE HA CREADO|QUIÉN HA SIDO QUIEN TE HA HECHO|¿Quién ha sido tu creador?|¿Quién ha sido quien te ha creado?|¿Quién ha sido quien te ha hecho?|¿Quién te ha hecho?|¿Quién te ha creado?|¿Quién te ha programado?|¿Quién te ha inventado?|¿Quién te ha construido?|quién te ha programado|quién te ha inventado|quién te ha construido|quien te ha programado|quien te ha inventado|quien te ha construido|quién ha sido tu diseñador|quien ha sido tu diseñador|quién ha sido tu inventor|quien ha sido tu inventor|QUIÉN TE HA PROGRAMADO|QUIÉN TE HA INVENTADO|QUIÉN TE HA CONSTRUIDO|QUIÉN HA SIDO TU DISEÑADOR|QUIÉN HA SIDO TU INVENTOR|quién ha sido el que te ha creado|quién ha sido el que te ha inventado|quién ha sido el que te ha programado|QUIÉN HA SIDO EL QUE TE HA CREADO|QUIÉN HA SIDO EL QUE TE HA INVENTADO|QUIÉN HA SIDO EL QUE TE HA PROGRAMADO|quién te ha desarrollado|quién ha sido tu desarrollador|QUIÉN TE HA DESARROLLADO|QUIÉN HA SIDO TU DESARROLLADOR|quién ha estado detrás de ti|QUIÉN HA ESTADO DETRÁS DE TI|¿Quién ha estado detrás de ti?|¿quién te ha desarrollado?|¿quién te ha creado?|¿quién te ha programado?|¿quién ha sido tu desarrollador?
+/i.test(message)) {
+        return handleCreatorQuery();
+      }
+      if (/chats anteriores|historial|historia de chat|ver chats/i.test(message)) {
+        return handleChatRetrieval();
+      }
+
+      // show loading
       loadingIndicator.style.display = &#039;block&#039;;
       messagesContainer.appendChild(loadingIndicator);
       messagesContainer.scrollTop = messagesContainer.scrollHeight;
-      
+
+      // choose loop endpoint
+      // KantEthicsAPI for explicit moral dilemmas (lie/mentir/sentimientos/etc.)
+      const ethicsPattern = /lie|mentir|sentimien(to|tos)|feelings?/i;
+      const loopId = ethicsPattern.test(message)
+        ? &#039;7ad36027-e0bb-443c-a9f1-1c522af568de&#039;  // KantEthicsAPI
+        : &#039;6a73ccb3-dcf4-4f27-bb29-09a102a6f078&#039;; // KantGPTAPI
+
       try {
-        // Send to KantGPT API
-        const response = await fetch(&#039;https://magicloops.dev/api/loop/6a73ccb3-dcf4-4f27-bb29-09a102a6f078/run&#039;, {
-          method: &#039;POST&#039;,
-          body: JSON.stringify({ &quot;query&quot;: message }),
-          headers: {
-            &#039;Content-Type&#039;: &#039;application/json&#039;
+        const response = await fetch(
+          `https://magicloops.dev/api/loop/${loopId}/run`,
+          {
+            method: &#039;POST&#039;,
+            headers: { &#039;Content-Type&#039;: &#039;application/json&#039; },
+            body: JSON.stringify({ query: message })
           }
-        });
-        
+        );
         const data = await response.json();
-        
-        // Hide loading indicator
         loadingIndicator.style.display = &#039;none&#039;;
-        
-        // Add AI response to chat
+
         if (data &amp;&amp; data.response) {
           addMessage(data.response);
         } else {
@@ -545,10 +544,14 @@
     }
     
     // Event listeners
-    sendButton.addEventListener(&#039;click&#039;, sendMessage);
-    
+    sendButton.addEventListener(&#039;click&#039;, (e) =&gt; {
+      e.preventDefault();
+      sendMessage();
+    });
+
     messageInput.addEventListener(&#039;keypress&#039;, (e) =&gt; {
       if (e.key === &#039;Enter&#039;) {
+        e.preventDefault();
         sendMessage();
       }
     });
@@ -748,4 +751,3 @@ console.log('Hello Magic App User!');
   </script>
 </body>
 </html>
-
